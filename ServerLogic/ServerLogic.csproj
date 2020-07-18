@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Platforms>AnyCPU;x64</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Linqdb\Linqdb.csproj" />
+    <ProjectReference Include="..\ServerSharedData\ServerSharedData.csproj" />
+  </ItemGroup>
+
+</Project>

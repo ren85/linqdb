@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>linqdb.net.windows.embedded.anycpu</id>
+    <version>1.03</version>
+    <title>Linqdb - embedded version for Windows any cpu</title>
+    <authors>https://github.com/ren85</authors>
+    <owners>https://github.com/ren85</owners>
+    <licenseUrl>http://linqdb.net/Home/License</licenseUrl>
+    <projectUrl>http://linqdb.net</projectUrl>
+    <iconUrl>http://linqdb.net/Content/favicon.ico</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Linqdb - embedded version for Windows any cpu</description>
+    <releaseNotes>First production release.</releaseNotes>
+    <copyright>Copyright 2017 linqdb.net</copyright>
+    <tags>C# database</tags>
+  </metadata>
+  <files>
+		<file src="bin\Release\LevelDB.NET.dll" target="lib\net45\LevelDB.NET.dll" />
+    </files>
+</package>

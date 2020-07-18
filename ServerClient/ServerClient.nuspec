@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>linqdb.net.windows.server.client.anycpu</id>
+    <version>1.04</version>
+    <title>Linqdb - server client version for Windows any cpu</title>
+    <authors>https://github.com/ren85</authors>
+    <owners>https://github.com/ren85</owners>
+    <licenseUrl>http://linqdb.net/Home/License</licenseUrl>
+    <projectUrl>http://linqdb.net</projectUrl>
+    <iconUrl>http://linqdb.net/Content/favicon.ico</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Linqdb - server client version for Windows any cpu</description>
+    <releaseNotes>First production release.</releaseNotes>
+    <copyright>Copyright 2017 linqdb.net</copyright>
+    <tags>C# database</tags>
+  </metadata>
+    <files>
+		<file src="bin\Release\ServerSharedData.dll" target="lib\net45\ServerSharedData.dll" />
+    </files>
+</package>

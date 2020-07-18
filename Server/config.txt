@@ -1,0 +1,9 @@
+db_path=DATA
+port=2055
+
+#default user with admin privileges. If default user is left in config, this effectively turns off credentials
+#format for each user is user.{username}.pass=password and user.{username}.role=role, 
+#where role is reader, writer or admin (reader = read only, writer = read and modify, admin = read, modify and replicate)
+
+user.admin.pass=admin
+user.admin.role=admin

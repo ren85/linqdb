@@ -1,0 +1,13 @@
+
+user.admin.pass=admin
+user.admin.role=admin
+
+user.reader_user.pass=re@der123
+user.reader_user.role=reader
+
+user.writer_user.pass=wr1ter123
+user.writer_user.role=writer
+
+user.admin_user.pass=@admin123
+user.admin_user.role=admin
+

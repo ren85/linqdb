@@ -1,0 +1,418 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ServerClient</name>
+    </assembly>
+    <members>
+        <member name="M:LinqdbClient.Db.#ctor(System.String,System.String,System.String)">
+            <summary>
+             Initialize database. Required once per application lifetime. If user or pass is not supplied, admin-admin is used.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.Db.GetTables">
+            <summary>
+             Get list of tables.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.Db.GetExistingIndexes">
+            <summary>
+             Get existing indexes.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.Db.GetTableDefinition(System.String)">
+            <summary>
+             Gets definition of a table.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.Db.Table``1">
+            <summary>
+             Indicates which table operation is to be performed on.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.Db.Table``1(LinqdbClient.LinqdbTransaction)">
+            <summary>
+             Indicates which table operation is to be performed on. Modification operations are performed in a given transaction.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.Db.Replicate(System.String)">
+            <summary>
+             Live replication of the database. If 'path' exists it will be deleted. Works best when database is least used.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.Db.Dispose">
+            <summary>
+            No operation
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Save(`0)">
+            <summary>
+             Saves new item if Id = 0 and assigns new Id. Updates existing item if Id is existing's item's Id.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.SaveNonAtomically(System.Collections.Generic.List{`0},System.Int32)">
+            <summary>
+             Saves any amount of items non-atomically, i.e. if it fails in the middle some items will be saved and some won't be.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.SaveBatch(System.Collections.Generic.List{`0})">
+            <summary>
+             Same as Save but more efficient.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Count">
+            <summary>
+             Record count.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.GetIds">
+            <summary>
+             Get selected ids without having to select them (more efficiently).
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.LastStep">
+            <summary>
+             Last search step. To be used in step-search.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Delete(System.Int32)">
+            <summary>
+             Deletes item with given Id.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Delete(System.Collections.Generic.HashSet{System.Int32})">
+            <summary>
+             Deletes items with given Ids.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.DeleteNonAtomically(System.Collections.Generic.HashSet{System.Int32},System.Int32)">
+            <summary>
+             Deletes any amount of items non-atomically, i.e. if it fails in the middle some items will be deleted and some won't be.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Update``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Int32,System.Nullable{System.Int32})">
+            <summary>
+             Updates item's field with supplied value. Item is identified by Id.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Update``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Int32,System.Int32)">
+            <summary>
+             Updates item's field with supplied value. Item is identified by Id.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Update``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Collections.Generic.Dictionary{System.Int32,System.Nullable{System.Int32}})">
+            <summary>
+             Updates item's fields with supplied values. Item are identified by Id.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.UpdateNonAtomically``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Collections.Generic.Dictionary{System.Int32,System.Nullable{System.Int32}},System.Int32)">
+            <summary>
+             Updates any amount of items non-atomically, i.e. if it fails in the middle some items will be updated and some won't be.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Update``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Collections.Generic.Dictionary{System.Int32,System.Int32})">
+            <summary>
+             Updates item's fields with supplied values. Item are identified by Id.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.UpdateNonAtomically``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Collections.Generic.Dictionary{System.Int32,System.Int32},System.Int32)">
+            <summary>
+             Updates any amount of items non-atomically, i.e. if it fails in the middle some items will be updated and some won't be.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Update``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Int32,System.Nullable{System.Double})">
+            <summary>
+             Updates item's field with supplied value. Item is identified by Id.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Update``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Int32,System.Double)">
+            <summary>
+             Updates item's field with supplied value. Item is identified by Id.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Update``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Collections.Generic.Dictionary{System.Int32,System.Nullable{System.Double}})">
+            <summary>
+             Updates item's fields with supplied values. Item are identified by Id.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.UpdateNonAtomically``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Collections.Generic.Dictionary{System.Int32,System.Nullable{System.Double}},System.Int32)">
+            <summary>
+             Updates any amount of items non-atomically, i.e. if it fails in the middle some items will be updated and some won't be.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Update``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Collections.Generic.Dictionary{System.Int32,System.Double})">
+            <summary>
+             Updates item's fields with supplied values. Item are identified by Id.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.UpdateNonAtomically``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Collections.Generic.Dictionary{System.Int32,System.Double},System.Int32)">
+            <summary>
+             Updates any amount of items non-atomically, i.e. if it fails in the middle some items will be updated and some won't be.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Update``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Int32,System.Nullable{System.DateTime})">
+            <summary>
+             Updates item's field with supplied value. Item is identified by Id.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Update``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Int32,System.DateTime)">
+            <summary>
+             Updates item's field with supplied value. Item is identified by Id.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Update``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Collections.Generic.Dictionary{System.Int32,System.Nullable{System.DateTime}})">
+            <summary>
+             Updates item's fields with supplied values. Item are identified by Id.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.UpdateNonAtomically``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Collections.Generic.Dictionary{System.Int32,System.Nullable{System.DateTime}},System.Int32)">
+            <summary>
+             Updates any amount of items non-atomically, i.e. if it fails in the middle some items will be updated and some won't be.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Update``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Collections.Generic.Dictionary{System.Int32,System.DateTime})">
+            <summary>
+             Updates item's fields with supplied values. Item are identified by Id.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.UpdateNonAtomically``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Collections.Generic.Dictionary{System.Int32,System.DateTime},System.Int32)">
+            <summary>
+             Updates any amount of items non-atomically, i.e. if it fails in the middle some items will be updated and some won't be.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Update``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Int32,System.Byte[])">
+            <summary>
+             Updates item's field with supplied value. Item is identified by Id.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Update``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Collections.Generic.Dictionary{System.Int32,System.Byte[]})">
+            <summary>
+             Updates item's fields with supplied values. Item are identified by Id.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.UpdateNonAtomically``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Collections.Generic.Dictionary{System.Int32,System.Byte[]},System.Int32)">
+            <summary>
+             Updates any amount of items non-atomically, i.e. if it fails in the middle some items will be updated and some won't be.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Update``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Int32,System.String)">
+            <summary>
+             Updates item's field with supplied value. Item is identified by Id.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Update``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Collections.Generic.Dictionary{System.Int32,System.String})">
+            <summary>
+             Updates item's fields with supplied values. Item are identified by Id.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.UpdateNonAtomically``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Collections.Generic.Dictionary{System.Int32,System.String},System.Int32)">
+            <summary>
+             Updates any amount of items non-atomically, i.e. if it fails in the middle some items will be updated and some won't be.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Select``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+            <summary>
+             Selects anonymous type using result entities. Select only what's needed as it is more efficient.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.SelectNonAtomically``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Int32)">
+            <summary>
+             Selects anonymous type using result entities. Selects in iterations to avoid select limit. Drawback is that it may return data not matching conditions if data changed after select began.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.SelectEntity">
+            <summary>
+             Selects entire entities using result set.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.SelectEntityNonAtomically(System.Int32)">
+            <summary>
+             Selects entire entities using result set. Selects in iterations to avoid select limit. Drawback is that it may return data not matching conditions if data changed after select began.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.AtomicIncrement``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Int32,`0,System.Nullable{System.Int32})">
+            <summary>
+             Atomically increment (decrement) value (https://en.wikipedia.org/wiki/Linearizability). Returns old value or null if item was created. Must be used after (and only) .Where, which identifies single record to update.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.AtomicIncrement2Props``2(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Linq.Expressions.Expression{System.Func{`0,``1}},System.Int32,System.Int32,`0)">
+            <summary>
+             Atomically increment (decrement) value (https://en.wikipedia.org/wiki/Linearizability). Must be used after (and only) .Where, which identifies single record to update.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Between``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Int32,System.Int32,LinqdbClient.BetweenBoundaries)">
+            <summary>
+             Applies between condition to the result set.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Between``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Double,System.Double,LinqdbClient.BetweenBoundaries)">
+            <summary>
+             Applies between condition to the result set.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Between``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.DateTime,System.DateTime,LinqdbClient.BetweenBoundaries)">
+            <summary>
+             Applies between condition to the result set.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Intersect``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Collections.Generic.HashSet{System.Nullable{System.Int32}})">
+            <summary>
+             Applies intersect condition to the result set.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Intersect``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Collections.Generic.HashSet{System.Int32})">
+            <summary>
+             Applies intersect condition to the result set.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Intersect``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Collections.Generic.HashSet{System.Nullable{System.Double}})">
+            <summary>
+             Applies intersect condition to the result set.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Intersect``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Collections.Generic.HashSet{System.Double})">
+            <summary>
+             Applies intersect condition to the result set.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Intersect``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Collections.Generic.HashSet{System.Nullable{System.DateTime}})">
+            <summary>
+             Applies intersect condition to the result set.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Intersect``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Collections.Generic.HashSet{System.DateTime})">
+            <summary>
+             Applies intersect condition to the result set.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Intersect``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Collections.Generic.HashSet{System.String})">
+            <summary>
+             Applies intersect condition to the result set.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Intersect``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Collections.Generic.List{System.Int32})">
+            <summary>
+             Applies intersect condition to the result set.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Intersect``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Collections.Generic.List{System.Nullable{System.Int32}})">
+            <summary>
+             Applies intersect condition to the result set.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Intersect``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Collections.Generic.List{System.Double})">
+            <summary>
+             Applies intersect condition to the result set.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Intersect``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Collections.Generic.List{System.Nullable{System.Double}})">
+            <summary>
+             Applies intersect condition to the result set.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Intersect``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Collections.Generic.List{System.DateTime})">
+            <summary>
+             Applies intersect condition to the result set.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Intersect``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Collections.Generic.List{System.Nullable{System.DateTime}})">
+            <summary>
+             Applies intersect condition to the result set.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Intersect``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Collections.Generic.List{System.String})">
+            <summary>
+             Applies intersect condition to the result set.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Search``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.String,System.Nullable{System.Int32},System.Nullable{System.Int32})">
+            <summary>
+             Full text search on a column.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.SearchPartial``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.String)">
+            <summary>
+             Full text search on a column matching beginning of a word.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Where(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
+            <summary>
+             Applies where condition to the result set.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.CreatePropertyMemoryIndex``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+            <summary>
+             Creates in-memory property index.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.CreateGroupByMemoryIndex``2(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Linq.Expressions.Expression{System.Func{`0,``1}})">
+            <summary>
+             Creates in-memory group-by index, parameter is property to be aggregated.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.RemovePropertyMemoryIndex``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+            <summary>
+             Removes index from startup creation.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.RemoveGroupByMemoryIndex``2(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Linq.Expressions.Expression{System.Func{`0,``1}})">
+            <summary>
+             Removes group index from startup creation.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.GroupBy``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+            <summary>
+             Groups data by key. Group index must be created in advance.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.Or">
+            <summary>
+             Applies or condition to the neighbouring statements.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.OrderBy``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+            <summary>
+             Orders data by ascending values.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbQueryable`1.OrderByDescending``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+            <summary>
+             Orders data by descending values.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbGroupedQueryable`2.Select``1(System.Linq.Expressions.Expression{System.Func{System.Linq.IGrouping{`1,`0},``0}})">
+            <summary>
+             Selects anonymous type using result entities. Select only what's needed as it is more efficient.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbOrderedQueryable`1.Select``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+            <summary>
+             Selects anonymous type using result entities. Select only what's needed as it is more efficient.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbOrderedQueryable`1.Select``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Int32@)">
+            <summary>
+             Selects anonymous type using result entities. Select only what's needed as it is more efficient.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbOrderedQueryable`1.SelectEntity">
+            <summary>
+             Selects entire entities using result set.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbOrderedQueryable`1.SelectEntity(System.Int32@)">
+            <summary>
+             Selects entire entities using result set.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbOrderedQueryable`1.Skip(System.Int32)">
+            <summary>
+             Skips some ordered values.
+            </summary>
+        </member>
+        <member name="M:LinqdbClient.ILinqDbOrderedQueryable`1.Take(System.Int32)">
+            <summary>
+             Takes some ordered values.
+            </summary>
+        </member>
+    </members>
+</doc>
