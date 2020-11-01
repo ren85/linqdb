@@ -7,3 +7,5 @@ port=2055
 
 user.admin.pass=admin
 user.admin.role=admin
+
+servername=somename

@@ -50,19 +50,20 @@ namespace Testing.basic_tests
             };
             db.Table<SomeData>().Save(d);
 
-            int total = 0;
+            var statistics = new LinqdbSelectStatistics();
             var res = db.Table<SomeData>()
                         .Where(f => f.Normalized > 2 && f.Normalized < 3)
                         .OrderBy(f => f.Date)
                         .Select(f => new
                         {
                             PeriodId = f.PeriodId
-                        }, out total);
-            if (res.Count() != total)
+                        }, statistics);
+            if (res.Count() != statistics.Total)
             {
                 throw new Exception("Assert failure");
             }
 
+            statistics = new LinqdbSelectStatistics();
             res = db.Table<SomeData>()
                         .OrderBy(f => f.Date)
                         .Skip(1)
@@ -70,18 +71,19 @@ namespace Testing.basic_tests
                         .Select(f => new
                         {
                             PeriodId = f.PeriodId
-                        }, out total);
-            if (total != 3)
+                        }, statistics);
+            if (statistics.Total != 3)
             {
                 throw new Exception("Assert failure");
             }
 
+            statistics = new LinqdbSelectStatistics();
             var res2 = db.Table<SomeData>()
                         .OrderBy(f => f.Date)
                         .Skip(1)
                         .Take(2)
-                        .SelectEntity(out total);
-            if (total != 3)
+                        .SelectEntity(statistics);
+            if (statistics.Total != 3)
             {
                 throw new Exception("Assert failure");
             }

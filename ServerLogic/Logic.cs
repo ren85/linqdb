@@ -69,15 +69,15 @@ namespace ServerLogic
             }
             catch (Exception ex)
             {
-                try
-                {
-                    if (!ex.Message.Contains("Linqdb:"))
-                    {
-                        var rg = new Random();
-                        File.WriteAllText("error_" + rg.Next() + ".txt", ex.Message + " " + ex.StackTrace + (ex.InnerException != null ? (" " + ex.InnerException.Message + " " + ex.InnerException.StackTrace) : ""));
-                    }
-                }
-                catch (Exception) { }
+                //try
+                //{
+                //    if (!ex.Message.Contains("Linqdb:"))
+                //    {
+                //        var rg = new Random();
+                //        File.WriteAllText("error_" + rg.Next() + ".txt", ex.Message + " " + ex.StackTrace + (ex.InnerException != null ? (" " + ex.InnerException.Message + " " + ex.InnerException.StackTrace) : ""));
+                //    }
+                //}
+                //catch (Exception) { }
                 var cm = new ServerResult()
                 {
                     ServerError = ex.Message

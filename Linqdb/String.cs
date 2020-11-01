@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -21,6 +22,10 @@ namespace LinqDbInternal
         int GetLastStep(TableInfo table_info)
         {
             return GetMaxId(table_info.Name) / PhaseStep;
+        }
+        int GetLastStep(string name)
+        {
+            return GetMaxId(name) / PhaseStep;
         }
 
         List<int> MakeSearch(string search_query, TableInfo table_info, string name, ReadOptions ro, bool partial, int? steps = null, int? start_step = null)

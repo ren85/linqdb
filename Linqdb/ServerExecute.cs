@@ -71,6 +71,15 @@ namespace LinqDbInternal
                 server_result.TableInfo = GetTables().Aggregate((a, b) => a + "|" + b);
                 return server_result;
             }
+            if (comm.Type == (int)CommandType.GetServerName)
+            {
+                if (!CommandHelper.CanRead(comm.User, comm.Pass))
+                {
+                    throw new LinqDbException("Linqdb: insufficient permissions for the user.");
+                }
+                server_result.TableInfo = CommandHelper.GetServerName();
+                return server_result;
+            }
             if (comm.Type == (int)CommandType.GetAllIndexes)
             {
                 if (!CommandHelper.CanRead(comm.User, comm.Pass))
@@ -300,7 +309,8 @@ namespace LinqDbInternal
                         info.Start_step = inst.Start_step;
                         info.Steps = inst.Steps;
                         info.Partial = inst.Double_null;
-
+                        info.TimeLimited = inst.Int_null;
+                        info.SearchTimeInMs = inst.Take;
                         var name = inst.Selector;
                         var table_info = GetTableInfo(comm.TableName);
                         info.TableInfo = table_info;
@@ -408,7 +418,8 @@ namespace LinqDbInternal
                             var where_res = CalculateWhereResult<object>(tree, table_info, ro);
                             where_res = FindBetween(tree, where_res, ro);
                             where_res = Intersect(tree, where_res, table_info, tree.QueryCache, ro);
-                            where_res = Search(tree, where_res, ro);
+                            double? searchPercentile = null;
+                            where_res = Search(tree, where_res, ro, out searchPercentile);
                             var fres = CombineData(where_res);
                             server_result.Count = fres.All ? GetTableRowCount(table_info, ro) : fres.ResIds.Count();
                         }
@@ -488,7 +499,8 @@ namespace LinqDbInternal
                         var where_res = CalculateWhereResult<object>(tree, table_info, ro);
                         where_res = FindBetween(tree, where_res, ro);
                         where_res = Intersect(tree, where_res, table_info, tree.QueryCache, ro);
-                        where_res = Search(tree, where_res, ro);
+                        double? searchPercentile = null;
+                        where_res = Search(tree, where_res, ro, out searchPercentile);
                         var fres = CombineData(where_res);
 
                         var total = GetTableRowCount(table_info, ro);
@@ -1658,12 +1670,17 @@ namespace LinqDbInternal
                 var where_res = CalculateWhereResult<object>(iq.LDBTree, table_info, ro);
                 where_res = FindBetween(iq.LDBTree, where_res, ro);
                 where_res = Intersect(iq.LDBTree, where_res, table_info, iq.LDBTree.QueryCache, ro);
-                where_res = Search(iq.LDBTree, where_res, ro);
+                double? searchPercentile = null;
+                where_res = Search(iq.LDBTree, where_res, ro, out searchPercentile);
                 int row_count = GetTableRowCount(table_info, ro);
 
                 var fres = CombineData(where_res);
                 var total = fres.All ? row_count : fres.ResIds.Count();
                 server_result.Total = total;
+                if (searchPercentile != null)
+                {
+                    server_result.LastStep = (int)(searchPercentile * 1000);
+                }
                 fres = OrderData(fres, iq.LDBTree, row_count, ro, table_info);
                 Dictionary<string, Tuple<List<int>, List<byte>>> data = new Dictionary<string, Tuple<List<int>, List<byte>>>();
                 server_result.SelectEntityResult = data;
@@ -1730,7 +1747,8 @@ namespace LinqDbInternal
                 var where_res = CalculateWhereResult<object>(iq.LDBTree, table_info, ro);
                 where_res = FindBetween(iq.LDBTree, where_res, ro);
                 where_res = Intersect(iq.LDBTree, where_res, table_info, iq.LDBTree.QueryCache, ro);
-                where_res = Search(iq.LDBTree, where_res, ro);
+                double? searchPercentile = null;
+                where_res = Search(iq.LDBTree, where_res, ro, out searchPercentile);
                 int row_count = GetTableRowCount(table_info, ro);
 
                 var fres = CombineData(where_res);

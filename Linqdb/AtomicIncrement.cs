@@ -22,8 +22,8 @@ namespace LinqDbInternal
             var _write_lock = GetTableWriteLock(typeof(T).Name);
             lock (_write_lock)
             {
-                int total = 0;
-                var res = this.SelectEntity<T>(source.LDBTree, out total);
+                var statistics = new LinqdbSelectStatisticsInternal();
+                var res = this.SelectEntity<T>(source.LDBTree, statistics);
                 if (res != null && res.Count() > 1)
                 {
                     throw new LinqDbException("Linqdb: more than one item identified");
@@ -233,8 +233,8 @@ namespace LinqDbInternal
             var _write_lock = GetTableWriteLock(typeof(T).Name);
             lock (_write_lock)
             {
-                int total = 0;
-                var res = this.SelectEntity<T>(source.LDBTree, out total);
+                var statistics = new LinqdbSelectStatisticsInternal();
+                var res = this.SelectEntity<T>(source.LDBTree, statistics);
                 if (res != null && res.Count() > 1)
                 {
                     throw new LinqDbException("Linqdb: more than one item identified");

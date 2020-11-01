@@ -188,8 +188,7 @@ namespace LinqDbInternal
             var table_info = GetTableInfo(table_type.Name);
             var pname = pars.First().Name;
 
-            if (!expr.ToString().StartsWith(pname) && !expr.ToString().StartsWith("Convert("+pname+")")
-                && !expr.ToString().StartsWith("Convert(" + pname + ", ISomeData)"))
+            if (expr.NodeType == ExpressionType.Convert && !expr.ToString().StartsWith(pname))
             {
                 throw new LinqDbException("Linqdb: Error in Where statement, probably type mismatch, for example int and int? are different types and both side of an expression must be of same type. Cast the right hand side's value.");
             }

@@ -107,6 +107,58 @@ namespace LinqdbClient
             return res_obj.TableInfo.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
         }
         /// <summary>
+        ///  Server's name from config.txt. This is cached field that is set after GetServerStatus().
+        /// </summary>
+        public string ServerName { get; set; }
+        /// <summary>
+        ///  Gets server's name and status. Returns after at most 1 second by default. If server doesn't reply in this period it is considered down.
+        /// </summary>
+        public LinqdbServerStatus GetServerStatus(int timeToWaitInMs = 1000)
+        {
+            try
+            {
+                Command cm = new Command();
+                cm.Type = (int)CommandType.GetServerName;
+                cm.TableName = "";
+                cm.User = _db.User;
+                cm.Pass = _db.Pass;
+                var bcm = CommandHelper.GetBytes(cm);
+                byte[] bres = null;
+                Task.Run(() =>
+                {
+                    bres = _db.CallServer(bcm);
+                })
+                .Wait(timeToWaitInMs);
+
+                if (bres != null)
+                {
+                    var res_obj = ServerResultHelper.GetServerResult(bres);
+                    ServerName = res_obj.TableInfo;
+                    return new LinqdbServerStatus()
+                    {
+                        ServerName = res_obj.TableInfo,
+                        IsUp = true
+                    };
+                }
+                else
+                {
+                    return new LinqdbServerStatus()
+                    {
+                        IsUp = false,
+                        ServerName = ServerName
+                    };
+                }
+            }
+            catch (Exception)
+            {
+                return new LinqdbServerStatus()
+                {
+                    IsUp = false,
+                    ServerName = ServerName
+                };
+            }
+        }
+        /// <summary>
         ///  Get existing indexes.
         /// </summary>
         public List<string> GetExistingIndexes()
@@ -830,7 +882,7 @@ namespace LinqdbClient
                 }
                 if (_internal.LDBTransaction.data_to_update.ContainsKey(name))
                 {
-                     _internal.LDBTransaction.data_to_update[name].Add(new KeyValuePair<string, Dictionary<int, byte[]>>(result.Selector, result.UpdateData));
+                    _internal.LDBTransaction.data_to_update[name].Add(new KeyValuePair<string, Dictionary<int, byte[]>>(result.Selector, result.UpdateData));
                 }
                 else
                 {
@@ -1603,7 +1655,7 @@ namespace LinqdbClient
         /// </summary>
         public List<R> Select<R>(Expression<Func<T, R>> predicate)
         {
-            var res = _internal._db.Select(predicate, null);
+            var res = _internal._db.Select(predicate);
             _internal.Result.Add(res);
 
             var def = _internal._db.GetTableDefinition<T>();
@@ -1613,6 +1665,24 @@ namespace LinqdbClient
             var res_obj = ServerResultHelper.GetServerResult(bres);
 
             return Ldb.CreateAnonymousType<R>(res_obj, def, _internal._db, res.AnonSelect);
+        }
+        /// <summary>
+        ///  Selects anonymous type using result entities. Select only what's needed as it is more efficient. Statistics is used as out parameter.
+        /// </summary>
+        public List<R> Select<R>(Expression<Func<T, R>> predicate, LinqdbSelectStatistics statistics)
+        {
+            var result = _internal._db.Select(predicate);
+            _internal.Result.Add(result);
+
+            var def = _internal._db.GetTableDefinition<T>();
+            var cm = CommandHelper.GetCommand(_internal.Result, def.Item1, def.Item2, typeof(T).Name, _internal._db.User, _internal._db.Pass);
+            var bcm = CommandHelper.GetBytes(cm);
+            var bres = _internal._db.CallServer(bcm);
+            var res_obj = ServerResultHelper.GetServerResult(bres);
+            statistics.Total = res_obj.Total;
+            statistics.SearchedPercentile = res_obj.LastStep / (double)1000;
+
+            return Ldb.CreateAnonymousType<R>(res_obj, def, _internal._db, result.AnonSelect);
         }
 
         /// <summary>
@@ -1648,8 +1718,8 @@ namespace LinqdbClient
                 var idSelector = GetExpression<IHaveId, int>(f => f.Id);
                 var intersectRes = _internal._db.Intersect(idSelector, new HashSet<int?>(currentIds));
                 _internal.Result.Add(intersectRes);
-              
-                var selectRes = _internal._db.Select(predicate, null);
+
+                var selectRes = _internal._db.Select(predicate);
                 _internal.Result.Add(selectRes);
                 cm = CommandHelper.GetCommand(_internal.Result, def.Item1, def.Item2, typeof(T).Name, _internal._db.User, _internal._db.Pass);
                 bcm = CommandHelper.GetBytes(cm);
@@ -1657,7 +1727,7 @@ namespace LinqdbClient
                 res_obj = ServerResultHelper.GetServerResult(bres);
 
                 var iterRes = Ldb.CreateAnonymousType<R>(res_obj, def, _internal._db, selectRes.AnonSelect);
-                results.AddRange(iterRes);            
+                results.AddRange(iterRes);
             }
         }
 
@@ -1682,6 +1752,24 @@ namespace LinqdbClient
             var bcm = CommandHelper.GetBytes(cm);
             var bres = _internal._db.CallServer(bcm);
             var res_obj = ServerResultHelper.GetServerResult(bres);
+
+            return Ldb.CreateType<T>(res_obj, def, _internal._db);
+        }
+        /// <summary>
+        ///  Selects entire entities using result set. Statistics is used as out parameter.
+        /// </summary>
+        public List<T> SelectEntity(LinqdbSelectStatistics statistics)
+        {
+            var result = _internal._db.SelectEntity<T>();
+            _internal.Result.Add(result);
+
+            var def = _internal._db.GetTableDefinition<T>();
+            var cm = CommandHelper.GetCommand(_internal.Result, def.Item1, def.Item2, typeof(T).Name, _internal._db.User, _internal._db.Pass);
+            var bcm = CommandHelper.GetBytes(cm);
+            var bres = _internal._db.CallServer(bcm);
+            var res_obj = ServerResultHelper.GetServerResult(bres);
+            statistics.Total = res_obj.Total;
+            statistics.SearchedPercentile = res_obj.LastStep / (double)1000;
 
             return Ldb.CreateType<T>(res_obj, def, _internal._db);
         }
@@ -1720,7 +1808,7 @@ namespace LinqdbClient
                 var intersectRes = _internal._db.Intersect(idSelector, new HashSet<int?>(currentIds));
                 _internal.Result.Add(intersectRes);
 
-                var selectRes =  _internal._db.SelectEntity<T>();
+                var selectRes = _internal._db.SelectEntity<T>();
                 _internal.Result.Add(selectRes);
 
                 cm = CommandHelper.GetCommand(_internal.Result, def.Item1, def.Item2, typeof(T).Name, _internal._db.User, _internal._db.Pass);
@@ -1956,7 +2044,7 @@ namespace LinqdbClient
         /// </summary>
         public ILinqDbQueryable<T> Search<TKey>(Expression<Func<T, TKey>> keySelector, string search_query, int? start_step = null, int? steps = null)
         {
-            var result = _internal._db.Search(keySelector, search_query, false, start_step, steps);
+            var result = _internal._db.Search(keySelector, search_query, false, false, 0, start_step, steps);
             _internal.Result.Add(result);
             return this;
         }
@@ -1965,7 +2053,16 @@ namespace LinqdbClient
         /// </summary>
         public ILinqDbQueryable<T> SearchPartial<TKey>(Expression<Func<T, TKey>> keySelector, string search_query)
         {
-            var result = _internal._db.Search(keySelector, search_query, true, null, null);
+            var result = _internal._db.Search(keySelector, search_query, true, false, 0, null, null);
+            _internal.Result.Add(result);
+            return this;
+        }
+        /// <summary>
+        ///  Full text search on a column, limited by time period.
+        /// </summary>
+        public ILinqDbQueryable<T> SearchTimeLimited<TKey>(Expression<Func<T, TKey>> keySelector, string search_query, int maxSearchTimeInMs)
+        {
+            var result = _internal._db.Search(keySelector, search_query, false, true, maxSearchTimeInMs, null, null);
             _internal.Result.Add(result);
             return this;
         }
@@ -2106,7 +2203,7 @@ namespace LinqdbClient
         /// </summary>
         public List<R> Select<R>(Expression<Func<T, R>> predicate)
         {
-            var result = _internal._db.Select(predicate, null);
+            var result = _internal._db.Select(predicate);
             _internal.Result.Add(result);
 
             var def = _internal._db.GetTableDefinition<T>();
@@ -2118,12 +2215,11 @@ namespace LinqdbClient
             return Ldb.CreateAnonymousType<R>(res_obj, def, _internal._db, result.AnonSelect);
         }
         /// <summary>
-        ///  Selects anonymous type using result entities. Select only what's needed as it is more efficient.
+        ///  Selects anonymous type using result entities. Select only what's needed as it is more efficient. Statistics is used as out parameter.
         /// </summary>
-        public List<R> Select<R>(Expression<Func<T, R>> predicate, out int total)
+        public List<R> Select<R>(Expression<Func<T, R>> predicate, LinqdbSelectStatistics statistics)
         {
-            total = 0;
-            var result = _internal._db.Select(predicate, total);
+            var result = _internal._db.Select(predicate);
             _internal.Result.Add(result);
 
             var def = _internal._db.GetTableDefinition<T>();
@@ -2131,7 +2227,8 @@ namespace LinqdbClient
             var bcm = CommandHelper.GetBytes(cm);
             var bres = _internal._db.CallServer(bcm);
             var res_obj = ServerResultHelper.GetServerResult(bres);
-            total = res_obj.Total;
+            statistics.Total = res_obj.Total;
+            statistics.SearchedPercentile = res_obj.LastStep / (double)1000;
 
             return Ldb.CreateAnonymousType<R>(res_obj, def, _internal._db, result.AnonSelect);
         }
@@ -2153,11 +2250,10 @@ namespace LinqdbClient
             return Ldb.CreateType<T>(res_obj, def, _internal._db);
         }
         /// <summary>
-        ///  Selects entire entities using result set.
+        ///  Selects entire entities using result set. Statistics is used as out parameter.
         /// </summary>
-        public List<T> SelectEntity(out int total)
+        public List<T> SelectEntity(LinqdbSelectStatistics statistics)
         {
-            total = 0;
             var result = _internal._db.SelectEntity<T>();
             _internal.Result.Add(result);
 
@@ -2166,7 +2262,8 @@ namespace LinqdbClient
             var bcm = CommandHelper.GetBytes(cm);
             var bres = _internal._db.CallServer(bcm);
             var res_obj = ServerResultHelper.GetServerResult(bres);
-            total = res_obj.Total;
+            statistics.Total = res_obj.Total;
+            statistics.SearchedPercentile = res_obj.LastStep / (double)1000;
 
             return Ldb.CreateType<T>(res_obj, def, _internal._db);
         }

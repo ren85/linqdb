@@ -2,6 +2,7 @@
 using ServerSharedData;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -11,7 +12,7 @@ namespace LinqDbInternal
 {
     public partial class Ldb
     {
-        public IDbQueryable<T> Search<T, TKey>(IDbQueryable<T> source, Expression<Func<T, TKey>> keySelector, string search_query, bool partial, int? start_step, int? steps)
+        public IDbQueryable<T> Search<T, TKey>(IDbQueryable<T> source, Expression<Func<T, TKey>> keySelector, string search_query, bool partial, bool timeLimited, int timeLimitInMs, int? start_step, int? steps)
         {
             if (start_step != null && steps == null || start_step == null && steps != null)
             {
@@ -36,6 +37,8 @@ namespace LinqDbInternal
             tree.SearchInfo.Add(info);
             info.SearchQuery = search_query;
             info.Partial = partial;
+            info.TimeLimited = timeLimited;
+            info.SearchTimeInMs = timeLimitInMs;
             info.Start_step = start_step;
             info.Steps = steps;
 
@@ -52,8 +55,9 @@ namespace LinqDbInternal
             return source;
         }
 
-        public List<OperResult> Search(QueryTree tree, List<OperResult> oper_list, ReadOptions ro)
+        public List<OperResult> Search(QueryTree tree, List<OperResult> oper_list, ReadOptions ro, out double? searchPercintile)
         {
+            searchPercintile = null;
             if (tree.SearchInfo == null)
             {
                 return oper_list;
@@ -61,7 +65,9 @@ namespace LinqDbInternal
             
             foreach (var s in tree.SearchInfo)
             {
-                var res = SearchOne(s, ro, s.Partial, s.Steps, s.Start_step);
+                double? onePercentile = null;
+                var res = SearchOne(s, ro, s.Partial, s.TimeLimited, s.SearchTimeInMs, out onePercentile, s.Steps, s.Start_step);
+                searchPercintile = onePercentile;
                 var oper_res = new OperResult()
                 {
                     All = false,
@@ -75,13 +81,39 @@ namespace LinqDbInternal
             return oper_list;
         }
 
-        public List<int> SearchOne(SearchInfo info, ReadOptions ro, bool partial, int? steps = null, int? start_step = null)
+        public List<int> SearchOne(SearchInfo info, ReadOptions ro, bool partial, bool timeLimited, int timeLimitInMs, out double? searchPercintile, int? steps = null, int? start_step = null)
         {
+            searchPercintile = null;
             if (!info.Name.ToLower().EndsWith("search"))
             {
                 throw new LinqDbException("Linqdb: only string properties named ...Search are indexed and can be searched.");
             }
-            return MakeSearch(info.SearchQuery, info.TableInfo, info.Name, ro, partial, steps, start_step);
+            int totalSteps = GetLastStep(info.TableInfo.Name);
+            if (!timeLimited)
+            {
+                return MakeSearch(info.SearchQuery, info.TableInfo, info.Name, ro, partial, steps, start_step);
+            }
+            else
+            {
+                var sw = new Stopwatch();
+                sw.Start();
+                int oneSearchSteps = 50;
+                var res = new List<int>();
+                int stepCount = 0;
+                for (; sw.ElapsedMilliseconds < timeLimitInMs && stepCount <= totalSteps; stepCount += oneSearchSteps)
+                {
+                    res.AddRange(MakeSearch(info.SearchQuery, info.TableInfo, info.Name, ro, partial, oneSearchSteps, stepCount));
+                }
+                if (stepCount > totalSteps)
+                {
+                    searchPercintile = 100;
+                }
+                else
+                {
+                    searchPercintile = (double)(stepCount * 100) / (double)totalSteps;
+                }
+                return res;
+            }
         }
     }
 
@@ -90,6 +122,8 @@ namespace LinqDbInternal
     {
         public string SearchQuery { get; set; }
         public bool Partial { get; set; }
+        public bool TimeLimited { get; set; }
+        public int SearchTimeInMs { get; set; }
         public TableInfo TableInfo { get; set; }
         public string Name { get; set; }
         public int? Start_step { get; set; }

@@ -30,7 +30,8 @@ namespace LinqDbInternal
                     var where_res = CalculateWhereResult<T>(tree, table_info, ro);
                     where_res = FindBetween(tree, where_res, ro);
                     where_res = Intersect(tree, where_res, table_info, tree.QueryCache, ro);
-                    where_res = Search(tree, where_res, ro);
+                    double? searchPercentile = null;
+                    where_res = Search(tree, where_res, ro, out searchPercentile);
                     var fres = CombineData(where_res);
                     return fres.All ? GetTableRowCount(table_info, ro) : fres.ResIds.Count();
                 }

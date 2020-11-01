@@ -38,7 +38,7 @@ namespace LinqDbClientInternal
             return res;
         }
 
-        public ClientResult Select<T, R>(Expression<Func<T, R>> predicate, int? total = null)
+        public ClientResult Select<T, R>(Expression<Func<T, R>> predicate)
         {
             var res = new ClientResult();
             res.Type = "selectanon";

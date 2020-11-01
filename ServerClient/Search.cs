@@ -10,7 +10,7 @@ namespace LinqDbClientInternal
 {
     public partial class Ldb
     {
-        public ClientResult Search<T, TKey>(Expression<Func<T, TKey>> keySelector, string search_query, bool partial, int? start_step, int? steps)
+        public ClientResult Search<T, TKey>(Expression<Func<T, TKey>> keySelector, string search_query, bool partial, bool timeLimited, int searchTimeLimitInMs, int? start_step, int? steps)
         {
             if (start_step != null && steps == null || start_step == null && steps != null)
             {
@@ -26,6 +26,8 @@ namespace LinqDbClientInternal
             res.Start_step = start_step;
             res.Steps = steps;
             res.Double_null = partial;
+            res.Int_null = timeLimited;
+            res.Take = searchTimeLimitInMs;
             return res;            
         }
     }

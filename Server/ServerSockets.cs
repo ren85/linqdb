@@ -104,12 +104,25 @@ namespace Server
         }
         private static void LoopToStartAccept()
         {
-            SocketAsyncEventArgs acceptEventArg = new SocketAsyncEventArgs();
-            acceptEventArg.Completed += new EventHandler<SocketAsyncEventArgs>(Service);
-            bool willRaiseEvent = listener.AcceptAsync(acceptEventArg);
-            if (!willRaiseEvent)
+            try
             {
-                Task.Run(() => Service(null, acceptEventArg));
+                SocketAsyncEventArgs acceptEventArg = new SocketAsyncEventArgs();
+                acceptEventArg.Completed += new EventHandler<SocketAsyncEventArgs>(Service);
+                bool willRaiseEvent = listener.AcceptAsync(acceptEventArg);
+                if (!willRaiseEvent)
+                {
+                    Task.Run(() => Service(null, acceptEventArg));
+                }
+            }
+            catch (Exception ex)
+            {
+                try
+                {
+                    var rg = new Random();
+                    File.WriteAllText("Loop_start_error_" + rg.Next() + ".txt", ex.Message + " " + ex.StackTrace + (ex.InnerException != null ? (" " + ex.InnerException.Message + " " + ex.InnerException.StackTrace) : ""));
+                }
+                catch (Exception) { }
+                LoopToStartAccept();
             }
         }
         private static void HandleBadAccept(SocketAsyncEventArgs acceptEventArgs)
@@ -121,15 +134,46 @@ namespace Server
         }
         private static void Service(object sender, SocketAsyncEventArgs e)
         {
-            if (e.SocketError != SocketError.Success)
+            try
             {
+                if (e.SocketError != SocketError.Success)
+                {
+                    LoopToStartAccept();
+                    HandleBadAccept(e);
+                    return;
+                }
+
                 LoopToStartAccept();
-                HandleBadAccept(e);
+            }
+            catch (Exception ex)
+            {
+                try
+                {
+                    var rg = new Random();
+                    File.WriteAllText("service_error_" + rg.Next() + ".txt", ex.Message + " " + ex.StackTrace + (ex.InnerException != null ? (" " + ex.InnerException.Message + " " + ex.InnerException.StackTrace) : ""));
+                }
+                catch (Exception) { }
+
+                try
+                {
+                    LoopToStartAccept();
+                    if (e != null && e.AcceptSocket != null)
+                    {
+                        HandleBadAccept(e);
+                    }
+                    return;
+                }
+                catch (Exception ex1)
+                {
+                    try
+                    {
+                        var rg = new Random();
+                        File.WriteAllText("bad_service_error_" + rg.Next() + ".txt", ex1.Message + " " + ex1.StackTrace + (ex1.InnerException != null ? (" " + ex1.InnerException.Message + " " + ex1.InnerException.StackTrace) : ""));
+                    }
+                    catch (Exception) { }
+                }
                 return;
             }
-
-            LoopToStartAccept();
-
 
             try
             {

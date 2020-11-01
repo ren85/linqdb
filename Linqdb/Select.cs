@@ -104,7 +104,7 @@ namespace LinqDbInternal
         {
             public int read_size_bytes { get; set; }
         }
-        public List<T> SelectEntity<T>(QueryTree tree, out int total) where T : new()
+        public List<T> SelectEntity<T>(QueryTree tree, LinqdbSelectStatisticsInternal statistics) where T : new()
         {
             CheckTableInfo<T>();
 
@@ -116,11 +116,13 @@ namespace LinqDbInternal
                 var where_res = CalculateWhereResult<T>(tree, table_info, ro);
                 where_res = FindBetween(tree, where_res, ro);
                 where_res = Intersect(tree, where_res, table_info, tree.QueryCache, ro);
-                where_res = Search(tree, where_res, ro);
+                double? searchPercentile = null;
+                where_res = Search(tree, where_res, ro, out searchPercentile);
                 int row_count = GetTableRowCount(table_info, ro);
 
                 var fres = CombineData(where_res);
-                total = fres.All ? row_count : fres.ResIds.Count();
+                statistics.Total = fres.All ? row_count : fres.ResIds.Count();
+                statistics.SearchedPercentile = searchPercentile;
                 fres = OrderData(fres, tree, row_count, ro, table_info);
                 int count = fres.All ? row_count : fres.ResIds.Count();
                 Dictionary<string, Tuple<List<int>, List<byte>>> data = new Dictionary<string, Tuple<List<int>, List<byte>>>();
@@ -368,7 +370,7 @@ namespace LinqDbInternal
             }
         }
 
-        public List<R> Select<T, R>(QueryTree tree, Expression<Func<T, R>> predicate, out int total) where T : new()
+        public List<R> Select<T, R>(QueryTree tree, Expression<Func<T, R>> predicate, LinqdbSelectStatisticsInternal statistics) where T : new()
         {
             CheckTableInfo<T>();
             using (var snapshot = leveld_db.CreateSnapshot())
@@ -380,11 +382,13 @@ namespace LinqDbInternal
                 var where_res = CalculateWhereResult<T>(tree, table_info, ro);
                 where_res = FindBetween(tree, where_res, ro);
                 where_res = Intersect(tree, where_res, table_info, tree.QueryCache, ro);
-                where_res = Search(tree, where_res, ro);
+                double? searchPercentile = null;
+                where_res = Search(tree, where_res, ro, out searchPercentile);
+                statistics.SearchedPercentile = searchPercentile;
                 int row_count = GetTableRowCount(table_info, ro);
 
                 var fres = CombineData(where_res);
-                total = fres.All ? row_count : fres.ResIds.Count();
+                statistics.Total = fres.All ? row_count : fres.ResIds.Count();
                 fres = OrderData(fres, tree, row_count, ro, table_info);
                 int count = fres.All ? row_count : fres.ResIds.Count();
                 var body = predicate.Body;

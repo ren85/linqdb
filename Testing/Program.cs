@@ -153,6 +153,7 @@ namespace Testing
                     new DeleteAsFirst(),
                     new LastStep(),
                     new AtomicIncrement(),
+                    //new AtomicIncrement2(),
                     new AtomicIncrementTransaction(),
                     new TransactionString(),
                     new TransactionIds(),
@@ -161,6 +162,7 @@ namespace Testing
                     new GetTableDefinition(),
                     #if (SERVER && !INDEXES)
                         new Config(),
+                        new ServerStatus(),
                     #endif 
                     #if (!SOCKETS) //server/client architecture may differ
                         new SelectTooMuch(),
@@ -220,7 +222,9 @@ namespace Testing
                     new CaseInsensitive(),
                     new MaxBinaryAndString(),
                     new NonAtomicModifications(),
-                    new SelectNonAtomically()
+                    new SelectNonAtomically(),
+                    new SearchTimeLimited(),
+                    new GenericType2()
                 };
 
                 var tests2 = new List<ITest>()

@@ -40,6 +40,7 @@ namespace ServerSharedData
 
         static Dictionary<string, string> config = new Dictionary<string, string>();
         public static ConcurrentDictionary<string, Tuple<string, Role>> users = new ConcurrentDictionary<string, Tuple<string, Role>>();
+        public static string ServerName = string.Empty;
         public static void ReadConfig(out string db_path, out int port)
         {
             //read config
@@ -96,6 +97,14 @@ namespace ServerSharedData
             {
                 port = 2055;
             }
+            if (config.ContainsKey("servername"))
+            {
+                ServerName = config["servername"];
+            }
+            else
+            {
+                ServerName = "unknown";
+            }
         }
         public static bool CanRead(string user, string pass)
         {
@@ -141,6 +150,10 @@ namespace ServerSharedData
             {
                 return true;
             }
+        }
+        public static string GetServerName()
+        {
+            return ServerName;
         }
         public static string CalculateMD5Hash(string input)
         {
@@ -1014,6 +1027,7 @@ namespace ServerSharedData
         GetGivenTable = 2,
         GetNewIds = 3,
         Transaction = 4,
-        GetAllIndexes = 5
+        GetAllIndexes = 5,
+        GetServerName = 6
     }
 }

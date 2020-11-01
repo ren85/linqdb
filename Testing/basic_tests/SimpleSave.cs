@@ -25,6 +25,7 @@ namespace Testing.basic_tests
             {
                 db._db_internal.Sock = new ClientSockets();
             }
+            //string Hostname = "92.204.5.245";
             string Hostname = "127.0.0.1";
             int Port = 2055;
             string error = null;
@@ -64,6 +65,8 @@ user.writer_user.role=writer
 
 user.admin_user.pass=@admin123
 user.admin_user.role=admin
+
+servername=5.5.5.5:2055
 
 ");
                         string str;

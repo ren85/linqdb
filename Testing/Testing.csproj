@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <DefineConstants>SAMEDB</DefineConstants>
+    <DefineConstants>SERVER;INDEXES</DefineConstants>
     <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
