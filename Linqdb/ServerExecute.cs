@@ -383,6 +383,14 @@ namespace LinqDbInternal
                     }
                     SelectServer(comm, iq, server_result, inst.Type, inst.AnonSelect);
                 }
+                else if (inst.Type.StartsWith("getqueue"))
+                {
+                    if (!CommandHelper.CanRead(comm.User, comm.Pass))
+                    {
+                        throw new LinqDbException("Linqdb: insufficient permissions for the user.");
+                    }
+                    server_result.QueueData = GetQueue(comm);
+                }
                 else if (inst.Type == "last")
                 {
                     if (!CommandHelper.CanRead(comm.User, comm.Pass))
@@ -510,6 +518,14 @@ namespace LinqDbInternal
                     }
 
                     return server_result;
+                }
+                else if (inst.Type == "queue")
+                {
+                    if (!CommandHelper.CanWrite(comm.User, comm.Pass))
+                    {
+                        throw new LinqDbException("Linqdb: insufficient permissions for the user.");
+                    }
+                    SaveQueue(inst.QueueData, comm);
                 }
                 else if (inst.Type == "save")
                 {
@@ -915,6 +931,14 @@ namespace LinqDbInternal
                 exclude.UnionWith(res);
                 return new Tuple<HashSet<int>, List<BinData>>(exclude, old_items);
             }
+        }
+        void SaveQueue(byte[] item, Command comm)
+        {
+            Queue.PutToQueue(item, comm.TableName);
+        }
+        byte[] GetQueue(Command comm)
+        {
+            return Queue.GetAllFromQueue(comm.TableName);
         }
         void SaveServer(List<BinData> Data, Command comm, ServerResult server_result, WriteBatchWithConstraints trans_batch, Dictionary<string, int> trans_count_cache, Dictionary<string, KeyValuePair<TableInfo, Dictionary<string, KeyValuePair<byte[], HashSet<int>>>>> scache)
         {

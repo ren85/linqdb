@@ -186,6 +186,21 @@ namespace ServerSharedData
             return cm;
         }
 
+        public static Command GetQueueCommand(List<ClientResult> result, string type_name, string user, string pass)
+        {
+            var cm = new Command();
+            cm.Type = (byte)CommandType.DbCommand;
+            cm.TableName = type_name;
+            cm.Commands = result;
+            for (short i = 0; i < cm.Commands.Count; i++)
+            {
+                cm.Commands[i].Id = i;
+            }            
+            cm.User = user;
+            cm.Pass = pass;
+            return cm;
+        }
+
         public static byte[] GetBytes(Command comm, bool no_prefix = false)
         {
             var result = new List<byte>(250);
@@ -274,11 +289,26 @@ namespace ServerSharedData
                     if (!string.IsNullOrEmpty(cr.Selector))
                     {
                         tn = Encoding.UTF8.GetBytes(cr.Selector);
-                        result.Add((byte)tn.Length);
+                        result.AddRange(BitConverter.GetBytes(tn.Length));
                         result.AddRange(tn);
                     }
                     else
                     {
+                        result.Add((byte)0);
+                        result.Add((byte)0);
+                        result.Add((byte)0);
+                        result.Add((byte)0);
+                    }
+                    if (cr.QueueData != null && cr.QueueData.Any())
+                    {
+                        result.AddRange(BitConverter.GetBytes(cr.QueueData.Length));
+                        result.AddRange(cr.QueueData);
+                    }
+                    else
+                    {
+                        result.Add((byte)0);
+                        result.Add((byte)0);
+                        result.Add((byte)0);
                         result.Add((byte)0);
                     }
                     if (cr.AnonSelect != null && cr.AnonSelect.Any())
@@ -678,22 +708,27 @@ namespace ServerSharedData
                 {
                     current++;
                 }
-                if (comms[current] != 0)
-                {
-                    len = BitConverter.ToInt16(new byte[2] { comms[current], 0 }, 0);
-                    current++;
-                    byte[] k = new byte[len];
-                    for (int j = 0; j < len; j++, current++)
+                ilen = BitConverter.ToInt32(new byte[4] { comms[current], comms[current + 1], comms[current + 2], comms[current + 3] }, 0);
+                current += 4;
+                if (ilen != 0)
+                {                   
+                    byte[] k = new byte[ilen];
+                    for (int j = 0; j < ilen; j++, current++)
                     {
                         k[j] = comms[current];
                     }
                     cr.Selector = Encoding.UTF8.GetString(k);
                 }
-                else
+                ilen = BitConverter.ToInt32(new byte[4] { comms[current], comms[current + 1], comms[current + 2], comms[current + 3] }, 0);
+                current += 4;
+                if (ilen != 0)
                 {
-                    current++;
+                    cr.QueueData = new byte[ilen];
+                    for (int j = 0; j < ilen; j++, current++)
+                    {
+                        cr.QueueData[j] = comms[current];
+                    }
                 }
-
                 len = BitConverter.ToInt16(new byte[2] { comms[current], comms[current + 1], }, 0);
                 current += 2;
                 cr.AnonSelect = new List<string>();
@@ -980,6 +1015,7 @@ namespace ServerSharedData
         public short Id { get; set; }
         public string Type { get; set; }
         public string Selector { get; set; }
+        public byte[] QueueData { get; set; }
         public List<string> AnonSelect { get; set; }
         public List<SharedOper> Opers { get; set; }
         public short Boundaries { get; set; }

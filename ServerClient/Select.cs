@@ -31,6 +31,13 @@ namespace LinqDbClientInternal
             }
         }
 
+        public ClientResult GetFromQueue<T>()
+        {
+            var res = new ClientResult();
+            res.Type = "getqueue";
+            return res;
+        }
+
         public ClientResult SelectEntity<T>()
         {
             var res = new ClientResult();

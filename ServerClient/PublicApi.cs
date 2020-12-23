@@ -193,6 +193,14 @@ namespace LinqdbClient
             return res_obj.TableInfo;
         }
         /// <summary>
+        ///  Indicates which queue operation is to be performed on.
+        /// </summary>
+        public ILinqDbQueueQueryable<T> Queue<T>() where T : new()
+        {
+            var _inter = new IDbQueueQueryable<T>() { Result = new List<ClientResult>(), _db = this._db };
+            return new ILinqDbQueueQueryable<T>() { _internal = _inter };
+        }
+        /// <summary>
         ///  Indicates which table operation is to be performed on.
         /// </summary>
         public ILinqDbQueryable<T> Table<T>() where T : new()
@@ -238,6 +246,61 @@ namespace LinqdbClient
         public bool AllIds { get; set; }
     }
 
+    public class ILinqDbQueueQueryable<T> where T : new()
+    {
+        public IDbQueueQueryable<T> _internal { get; set; }
+
+        /// <summary>
+        ///  Puts item to memory-queue.
+        /// </summary>
+        public void PutToQueue(T item)
+        {
+            var result = _internal._db.PutToQueue(item);
+            _internal.Result.Add(result);
+            Command cm = CommandHelper.GetQueueCommand(_internal.Result, typeof(T).Name, _internal._db.User, _internal._db.Pass);
+            var bcm = CommandHelper.GetBytes(cm);
+            var bres = _internal._db.CallServer(bcm);
+            var res_obj = ServerResultHelper.GetServerResult(bres);
+            if (!string.IsNullOrEmpty(res_obj.ServerError))
+            {
+                throw new LinqDbException(res_obj.ServerError);
+            }
+        }
+        /// <summary>
+        ///  Gets all items from memory-queue
+        /// </summary>
+        public List<T> GetAllFromQueue()
+        {
+            var result = _internal._db.GetFromQueue<T>();
+            _internal.Result.Add(result);
+
+            var cm = CommandHelper.GetQueueCommand(_internal.Result, typeof(T).Name, _internal._db.User, _internal._db.Pass);
+            var bcm = CommandHelper.GetBytes(cm);
+            var bres = _internal._db.CallServer(bcm);
+            var res_obj = ServerResultHelper.GetServerResult(bres);
+            var res = new List<T>();
+            if (res_obj.QueueData == null || !res_obj.QueueData.Any())
+            {
+                return res;
+            }
+            int current = 0;
+            while (current < res_obj.QueueData.Count())
+            {
+                var l = BitConverter.ToInt32(new byte[4] { res_obj.QueueData[current], res_obj.QueueData[current + 1], res_obj.QueueData[current + 2], res_obj.QueueData[current + 3] }, 0);
+                current += 4;
+                var length = Convert.ToInt32(l);
+                var item_bytes = new byte[length];
+                for (int i = 0; i < length; i++)
+                {
+                    item_bytes[i] = res_obj.QueueData[current];
+                    current++;
+                }
+                var item = SharedUtils.DeserializeFromBytes<T>(SharedUtils.Decompress(item_bytes));
+                res.Add(item);
+            }
+            return res;
+        }
+    }
     public class ILinqDbQueryable<T> where T : new()
     {
         public IDbQueryable<T> _internal { get; set; }

@@ -15,6 +15,19 @@ namespace LinqDbClientInternal
     
     public partial class Ldb
     {
+        public ClientResult PutToQueue<T>(T item)
+        {
+            var res = new ClientResult();
+            res.Type = "queue";
+            var sitem = SharedUtils.SerializeToBytes(item);
+            sitem = SharedUtils.Compress(sitem);
+            if (sitem.Length > 1000000)
+            {
+                throw new LinqDbException("Linqdb: item too big for a queue");
+            }
+            res.QueueData = sitem;
+            return res;
+        }
         public ClientResult Save<T>(T item, Dictionary<string, string> def, Dictionary<string, short> order)
         {
             var res = new ClientResult();

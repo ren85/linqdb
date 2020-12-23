@@ -80,7 +80,7 @@ namespace ServerLogic
                 //catch (Exception) { }
                 var cm = new ServerResult()
                 {
-                    ServerError = ex.Message
+                    ServerError = ex.Message + ex.StackTrace
                 };
                 return ServerResultHelper.GetBytes(cm);
             }

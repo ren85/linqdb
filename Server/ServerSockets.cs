@@ -41,7 +41,12 @@ namespace Server
                     }
                 }
             }
-            catch { return; }
+            catch (Exception ex)
+            {
+                var rg = new Random();
+                File.WriteAllText("pinger_error_" + rg.Next() + ".txt", ex.Message + " " + ex.StackTrace + (ex.InnerException != null ? (" " + ex.InnerException.Message + " " + ex.InnerException.StackTrace) : ""));
+                return; 
+            }
         }
     }
     class ServerSockets
@@ -95,6 +100,8 @@ namespace Server
                 catch (Exception ex)
                 {
                     Console.WriteLine("BAD ERROR... " + ex.Message);
+                    var rg = new Random();
+                    File.WriteAllText("bad_error_" + rg.Next() + ".txt", ex.Message + " " + ex.StackTrace + (ex.InnerException != null ? (" " + ex.InnerException.Message + " " + ex.InnerException.StackTrace) : ""));
                 }
             }
         }

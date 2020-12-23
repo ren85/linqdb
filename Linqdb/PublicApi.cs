@@ -58,7 +58,7 @@ namespace LinqDb
                 int current = 1;
                 for (int i = 0; i < c_count; i++)
                 {
-                    int c_length = BitConverter.ToInt32(new byte[4] { input[current], input[current + 1], input[current + 2], input[current + 3] }, 0);
+                    int c_length = BitConverter.ToInt32(new byte[4] { input[current], input[current+1], input[current+2], input[current+3] }, 0);
                     current += 4;
                     byte[] c_data = new byte[c_length];
                     for (int j = 0; j < c_length; j++, current++)
@@ -401,7 +401,7 @@ namespace LinqDb
         /// </summary>
         public ILinqDbQueryable<T> Table<T>() where T : new()
         {
-            var _inter = _db.Table<T>();
+            var _inter =_db.Table<T>();
             return new ILinqDbQueryable<T>() { _internal = _inter };
         }
         /// <summary>
@@ -469,7 +469,7 @@ namespace LinqDb
                     return;
                 }
                 _internal._db.SaveBatch(res, _internal.LDBTransaction);
-            }
+            }            
         }
         /// <summary>
         ///  Same as Save but more efficient.
@@ -948,14 +948,14 @@ namespace LinqDb
                 var cids = ids.Skip(i * batchSize).Take(batchSize).Select(f => (int?)f).ToList();
                 if (!cids.Any())
                 {
-                    return results;
+                    return results;   
                 }
                 _internal.LDBTree = new QueryTree();
                 _internal._db.Intersect<T, int>(_internal, null, new HashSet<int?>(cids));
                 var statistics = new LinqdbSelectStatisticsInternal();
                 var res = _internal._db.Select(_internal.LDBTree, predicate, statistics);
                 results.AddRange(res);
-            }
+            }            
         }
 
         /// <summary>
@@ -1275,11 +1275,11 @@ namespace LinqDb
         /// <summary>
         ///  Selects anonymous type using result entities. Select only what's needed as it is more efficient.
         /// </summary>
-        public List<R> Select<R>(Expression<Func<IGrouping<TKey, T>, R>> predicate)
+        public List<R> Select<R>(Expression<Func<IGrouping<TKey, T> , R>> predicate)
         {
             int total;
             return _internal._db.SelectGrouped<TKey, T, R>(_internal.LDBTree, predicate, out total);
-        }
+        }        
     }
 
     public class ILinqDbOrderedQueryable<T> where T : new()
@@ -1343,7 +1343,7 @@ namespace LinqDb
     }
 
     public enum BetweenBoundaries : int
-    {
+    { 
         BothInclusive,
         FromInclusiveToExclusive,
         FromExclusiveToInclusive,

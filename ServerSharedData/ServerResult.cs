@@ -139,16 +139,26 @@ namespace ServerSharedData
             {
                 throw new Exception("Server " + res.ServerError);
             }
-            slen = BitConverter.ToInt16(new byte[2] { sr[current], sr[current + 1] }, 0);
-            current += 2;
-            if (slen != 0)
+            len = BitConverter.ToInt32(new byte[4] { sr[current], sr[current + 1], sr[current + 2], sr[current + 3] }, 0);
+            current += 4;
+            if (len != 0)
             {
-                byte[] k = new byte[slen];
-                for (int j = 0; j < slen; j++, current++)
+                byte[] k = new byte[len];
+                for (int j = 0; j < len; j++, current++)
                 {
                     k[j] = sr[current];
                 }
                 res.TableInfo = Encoding.UTF8.GetString(k);
+            }
+            len = BitConverter.ToInt32(new byte[4] { sr[current], sr[current + 1], sr[current + 2], sr[current + 3] }, 0);
+            current += 4;
+            if (len != 0)
+            {
+                res.QueueData = new byte[len];
+                for (int j = 0; j < len; j++, current++)
+                {
+                    res.QueueData[j] = sr[current];
+                }
             }
             sr = null;
             return res;
@@ -264,11 +274,25 @@ namespace ServerSharedData
             if (!string.IsNullOrEmpty(sr.TableInfo))
             {
                 tn = Encoding.UTF8.GetBytes(sr.TableInfo);
-                result.AddRange(BitConverter.GetBytes((short)sr.TableInfo.Length));
+                result.AddRange(BitConverter.GetBytes(sr.TableInfo.Length));
                 result.AddRange(tn);
             }
             else
             {
+                result.Add(0);
+                result.Add(0);
+                result.Add(0);
+                result.Add(0);
+            }
+            if (sr.QueueData != null && sr.QueueData.Any())
+            {
+                result.AddRange(BitConverter.GetBytes(sr.QueueData.Length));
+                result.AddRange(sr.QueueData);
+            }
+            else
+            {
+                result.Add(0);
+                result.Add(0);
                 result.Add(0);
                 result.Add(0);
             }
@@ -295,6 +319,7 @@ namespace ServerSharedData
         public string ServerError { get; set; }
         public int? Old_value { get; set; }
         public string TableInfo { get; set; }
+        public byte[] QueueData { get; set; }
         public Dictionary<int, List<object>> SelectGroupResult { get; set; }
     }
 }

@@ -224,7 +224,13 @@ namespace Testing
                     new NonAtomicModifications(),
                     new SelectNonAtomically(),
                     new SearchTimeLimited(),
-                    new GenericType2()
+                    new GenericType2(),
+                    #if (SERVER || SOCKETS)
+                        new SimpleQueue(),
+                        new QueuesPutGet(),
+                        new QueueOverwhelmed(),
+                        new QueuesPutGetLarge()
+                    #endif 
                 };
 
                 var tests2 = new List<ITest>()
@@ -271,7 +277,7 @@ namespace Testing
 #endif
 
                 var times = new List<int>();
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < 30; i++)
                 {
                     Console.Clear();
                     Console.WriteLine("SHUFFLE: " + i + "\n");
