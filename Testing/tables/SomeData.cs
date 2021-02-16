@@ -16,6 +16,7 @@ namespace Testing.tables
         public int? PersonId { get; set; }
         public DateTime? Date { get; set; }
         public string NameSearch { get; set; }
+        public string NameSearchS { get; set; }
         public int GroupBy { get; set; }
         public int GroupBy2 { get; set; }
         public string NotSearchable { get; set; }

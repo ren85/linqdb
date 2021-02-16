@@ -25,7 +25,7 @@ namespace Testing.basic_tests
             {
                 db._db_internal.Sock = new ClientSockets();
             }
-            //string Hostname = "127.0.0.1";
+            string Hostname = "127.0.0.1";
             int Port = 2055;
             string error = null;
             var res = db._db_internal.Sock.CallServer(input, Hostname, Port, out error);

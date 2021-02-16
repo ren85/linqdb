@@ -115,6 +115,10 @@ namespace LinqDbInternal
                     }
                 }
 
+                if (partial)
+                {
+                    wres = wres.Distinct().ToList();
+                }
                 if (res == null)
                 {
                     res = new List<int>(wres);
@@ -135,7 +139,7 @@ namespace LinqDbInternal
             }
         }
         int PhaseStep = 1000;
-        void UpdateIndex(string old_val, string new_val, int id, WriteBatchWithConstraints batch, short ColumnNumber, short TableNumber, Dictionary<string, KeyValuePair<byte[], HashSet<int>>> cache)
+        void UpdateIndex(string old_val, string new_val, int id, WriteBatchWithConstraints batch, short ColumnNumber, short TableNumber, Dictionary<string, KeyValuePair<byte[], HashSet<int>>> cache, bool bySpacesOnly)
         {
             int phase = id / PhaseStep;
             if (old_val != null)
@@ -151,7 +155,7 @@ namespace LinqDbInternal
             {
                 return;
             }
-            var removed = GetRemovedWords(old_val, new_val);
+            var removed = GetRemovedWords(old_val, new_val, bySpacesOnly);
             foreach (var r in removed)
             {
                 var kinfo = new IndexKeyInfo()
@@ -179,7 +183,7 @@ namespace LinqDbInternal
                     //}
                 }
             }
-            var new_words = GetAddedWords(old_val, new_val);
+            var new_words = GetAddedWords(old_val, new_val, bySpacesOnly);
             foreach (var n in new_words)
             {
                 var kinfo = new IndexKeyInfo()
@@ -263,48 +267,56 @@ namespace LinqDbInternal
         //    }
         //}
 
-        HashSet<string> GetDistinctWords(string val)
+        HashSet<string> GetDistinctWords(string val, bool bySpacesOnly)
         {
             if (string.IsNullOrEmpty(val))
             {
                 return new HashSet<string>();
             }
 
-            var res = new HashSet<string>(val.Split().Where(f => !string.IsNullOrEmpty(f)));
-            var more = new HashSet<string>(val.Trim(AsciiNonReadableString.ToArray())
-                                              .Split(AsciiNonReadableString.ToArray(), StringSplitOptions.RemoveEmptyEntries)
-                                              .Select(f => f.Trim())
-                                              .Where(f => !string.IsNullOrEmpty(f)));
-            res.UnionWith(more);
+            if (bySpacesOnly)
+            {
+                var res = new HashSet<string>(val.Split().Where(f => !string.IsNullOrEmpty(f)));
+                return res;
+            }
+            else
+            {
+                var res = new HashSet<string>(val.Split().Where(f => !string.IsNullOrEmpty(f)));
+                var more = new HashSet<string>(val.Trim(AsciiNonReadableString.ToArray())
+                                                  .Split(AsciiNonReadableString.ToArray(), StringSplitOptions.RemoveEmptyEntries)
+                                                  .Select(f => f.Trim())
+                                                  .Where(f => !string.IsNullOrEmpty(f)));
+                res.UnionWith(more);
 
-            //var long_words = res.Where(f => f.Length > 5).ToList();
-            //foreach (var w in long_words)
-            //{
-            //    var cw = w.Substring(0, 4);
-            //    for (int i = 4; i < w.Length; i++)
-            //    {
-            //        cw += w[i];
-            //        res.Add(cw);
-            //    }
-            //}
+                //var long_words = res.Where(f => f.Length > 5).ToList();
+                //foreach (var w in long_words)
+                //{
+                //    var cw = w.Substring(0, 4);
+                //    for (int i = 4; i < w.Length; i++)
+                //    {
+                //        cw += w[i];
+                //        res.Add(cw);
+                //    }
+                //}
 
-            return res;
+                return res;
+            }
         }
 
-        HashSet<string> GetAddedWords(string old_val, string new_val)
+        HashSet<string> GetAddedWords(string old_val, string new_val, bool bySpacesOnly)
         {
-            var oldw = GetDistinctWords(old_val);
-            var neww = GetDistinctWords(new_val);
+            var oldw = GetDistinctWords(old_val, bySpacesOnly);
+            var neww = GetDistinctWords(new_val, bySpacesOnly);
 
             neww.ExceptWith(oldw);
 
             return neww;
         }
 
-        HashSet<string> GetRemovedWords(string old_val, string new_val)
+        HashSet<string> GetRemovedWords(string old_val, string new_val, bool bySpacesOnly)
         {
-            var oldw = GetDistinctWords(old_val);
-            var neww = GetDistinctWords(new_val);
+            var oldw = GetDistinctWords(old_val, bySpacesOnly);
+            var neww = GetDistinctWords(new_val, bySpacesOnly);
 
             oldw.ExceptWith(neww);
 

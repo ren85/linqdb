@@ -11,7 +11,7 @@ namespace LinqDbInternal
     {
         public WriteBatch _writeBatch = new WriteBatch();
         long KeysCount { get; set; }
-        long MaxKeys = 1500000;
+        long MaxKeys = 3000000;
         public void Put(byte[] key, byte[] value)
         {
             KeysCount++;

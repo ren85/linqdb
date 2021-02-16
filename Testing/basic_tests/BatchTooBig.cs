@@ -28,7 +28,7 @@ namespace Testing.basic_tests
             db.Table<SomeData>().Delete(new HashSet<int>(db.Table<SomeData>().Select(f => new { f.Id }).Select(f => f.Id).ToList()));
 #endif
             var list = new List<SomeData>();
-            for (int i = 0; i < 250000; i++)
+            for (int i = 0; i < 500000; i++)
             {
                 list.Add(new SomeData());
             }
@@ -45,10 +45,10 @@ namespace Testing.basic_tests
                 }
             }
             list = new List<SomeData>();
-            for (int i = 0; i < 250000; i++)
+            for (int i = 0; i < 500000; i++)
             {
                 list.Add(new SomeData());
-                if (list.Count() > 50000)
+                if (list.Count() > 100000)
                 {
                     db.Table<SomeData>().SaveBatch(list);
                     list = new List<SomeData>();
@@ -73,7 +73,7 @@ namespace Testing.basic_tests
             }
             for(int i=0; ; i++)
             {
-                var part = ids.Skip(i * 50000).Take(50000).ToList();
+                var part = ids.Skip(i * 100000).Take(100000).ToList();
                 if (!part.Any())
                 {
                     break;

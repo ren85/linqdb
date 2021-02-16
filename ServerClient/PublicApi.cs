@@ -149,7 +149,7 @@ namespace LinqdbClient
                     };
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return new LinqdbServerStatus()
                 {

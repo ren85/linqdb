@@ -91,28 +91,9 @@ namespace ServerSharedData
         }
 
 
-        static bool first = true;
-        static object _lock = new object();
 
         public static TData DeserializeFromBytes<TData>(byte[] b)
         {
-            if (first)
-            {
-                lock (_lock)
-                {
-                    if (first)
-                    {
-                        var type = RuntimeTypeModel.Default.Add(typeof(TData), false);
-                        int i = 1;
-                        foreach (var prop in typeof(TData).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
-                        {
-                            type.Add(i, prop.Name);
-                            i++;
-                        }
-                        first = false;
-                    }
-                }
-            }
             using (var memoryStream = new MemoryStream(b))
             {
                 var info = Serializer.Deserialize<TData>(memoryStream);
@@ -122,23 +103,7 @@ namespace ServerSharedData
 
         public static byte[] SerializeToBytes<TData>(TData settings)
         {
-            if (first)
-            {
-                lock (_lock)
-                {
-                    if (first)
-                    {
-                        var type = RuntimeTypeModel.Default.Add(typeof(TData), false);
-                        int i = 1;
-                        foreach (var prop in typeof(TData).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
-                        {
-                            type.Add(i, prop.Name);
-                            i++;
-                        }
-                        first = false;
-                    }
-                }
-            }
+
             using (var memoryStream = new MemoryStream())
             {
                 Serializer.Serialize(memoryStream, settings);

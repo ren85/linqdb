@@ -224,8 +224,9 @@ namespace LinqDbInternal
                 {
                     Dictionary<string, Tuple<IndexNewData, IndexDeletedData, IndexChangedData>> meta_index = BuildMetaOnIndex(table_info);
                     Dictionary<string, KeyValuePair<byte[], HashSet<int>>> string_cache = new Dictionary<string, KeyValuePair<byte[], HashSet<int>>>();
+                    var lastPhase = GetLastStep(table_info);
                     SaveItems(table_info, typeof(T).Name, items.Cast<object>().ToList(), batch, null, string_cache, meta_index, false);
-                    WriteStringCacheToBatch(batch, string_cache, table_info);
+                    WriteStringCacheToBatch(batch, string_cache, table_info, lastPhase);
                     var snapshots_dic = InsertIndexChanges(table_info, meta_index);
                     foreach (var snap in snapshots_dic)
                     {
@@ -361,7 +362,7 @@ namespace LinqDbInternal
         //    public int? IntVal { get; set; }
         //}
 
-        public void WriteStringCacheToBatch(WriteBatchWithConstraints batch, Dictionary<string, KeyValuePair<byte[], HashSet<int>>> cache, TableInfo tinfo)
+        public void WriteStringCacheToBatch(WriteBatchWithConstraints batch, Dictionary<string, KeyValuePair<byte[], HashSet<int>>> cache, TableInfo tinfo, int? lastPhase)
         {
             var modified = new Dictionary<string, KeyValuePair<byte[], HashSet<int>>>();
             //int last_phase = GetLastStringPhase(tinfo, trans_phase_cache);
@@ -372,24 +373,33 @@ namespace LinqDbInternal
                 {
                     var parts = item.Key.Split(":".ToArray(), StringSplitOptions.None);
                     int phase = Convert.ToInt32(parts[0]);
+                    bool isNotThere = lastPhase != null && lastPhase + 1 < phase;
                     string hash = Convert.ToBase64String(sha1.ComputeHash(item.Value.Key));
                     if (parts[1] == "1") //add
                     {
                         byte[] val = null;
                         if (!modified.ContainsKey(hash))
                         {
-                            val = leveld_db.Get(item.Value.Key);
-                            if (val != null)
-                            {
-                                var old_index = ReadHashsetFromBytes(val);
-                                old_index.UnionWith(item.Value.Value);
-                                //batch.Put(item.Value.Key, WriteHashsetToBytes(old_index));
-                                modified[hash] = new KeyValuePair<byte[], HashSet<int>>(item.Value.Key, old_index);
-                            }
-                            else
+                            if (isNotThere)
                             {
                                 //batch.Put(item.Value.Key, WriteHashsetToBytes(item.Value.Value));
                                 modified[hash] = new KeyValuePair<byte[], HashSet<int>>(item.Value.Key, item.Value.Value);
+                            }
+                            else
+                            {
+                                val = leveld_db.Get(item.Value.Key);
+                                if (val != null)
+                                {
+                                    var old_index = ReadHashsetFromBytes(val);
+                                    old_index.UnionWith(item.Value.Value);
+                                    //batch.Put(item.Value.Key, WriteHashsetToBytes(old_index));
+                                    modified[hash] = new KeyValuePair<byte[], HashSet<int>>(item.Value.Key, old_index);
+                                }
+                                else
+                                {
+                                    //batch.Put(item.Value.Key, WriteHashsetToBytes(item.Value.Value));
+                                    modified[hash] = new KeyValuePair<byte[], HashSet<int>>(item.Value.Key, item.Value.Value);
+                                }
                             }
                         }
                         else
@@ -690,7 +700,11 @@ namespace LinqDbInternal
             }
             if (name.ToLower().EndsWith("search"))
             {
-                UpdateIndex(old_val, value, id, batch, table_info.ColumnNumbers[name], table_info.TableNumber, cache);
+                UpdateIndex(old_val, value, id, batch, table_info.ColumnNumbers[name], table_info.TableNumber, cache, false);
+            }
+            if (name.ToLower().EndsWith("searchs"))
+            {
+                UpdateIndex(old_val, value, id, batch, table_info.ColumnNumbers[name], table_info.TableNumber, cache, true);
             }
             Updateue(old_val, value, id, batch, table_info, name);
 

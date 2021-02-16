@@ -104,7 +104,7 @@ namespace LinqDbInternal
                             Dictionary<string, KeyValuePair<byte[], HashSet<int>>> string_cache = new Dictionary<string, KeyValuePair<byte[], HashSet<int>>>();
                             Dictionary<string, Tuple<IndexNewData, IndexDeletedData, IndexChangedData>> meta_index = BuildMetaOnIndex(table_info);
                             DeleteBatch(_delete_data.ids, table_info, batch, null, string_cache, meta_index);
-                            WriteStringCacheToBatch(batch, string_cache, table_info);
+                            WriteStringCacheToBatch(batch, string_cache, table_info, null);
                             var snapshots_dic = InsertIndexChanges(table_info, meta_index);
                             foreach (var snap in snapshots_dic)
                             {
@@ -316,7 +316,11 @@ namespace LinqDbInternal
             var column_name = table_info.ColumnNumbers.Select(f => new { f.Key, f.Value }).Where(f => f.Value == ColumnNumber).FirstOrDefault().Key;
             if (column_name.ToLower().EndsWith("search"))
             {
-                UpdateIndex(old_val_string, null, id, batch, ColumnNumber, TableNumber, cache);
+                UpdateIndex(old_val_string, null, id, batch, ColumnNumber, TableNumber, cache, false);
+            }
+            if (column_name.ToLower().EndsWith("searchs"))
+            {
+                UpdateIndex(old_val_string, null, id, batch, ColumnNumber, TableNumber, cache, true);
             }
         }
     }

@@ -854,7 +854,7 @@ namespace LinqDbInternal
                             Dictionary<string, Tuple<IndexNewData, IndexDeletedData, IndexChangedData>> meta_index = BuildMetaOnIndex(table_info);
                             var string_cache = new Dictionary<string, KeyValuePair<byte[], HashSet<int>>>();
                             server_result.Ids = SaveItems(Data, comm.TableDefOrder, batch, table_info, comm.TableName, trans_count_cache, string_cache, meta_index, false);
-                            WriteStringCacheToBatch(batch, string_cache, table_info);
+                            WriteStringCacheToBatch(batch, string_cache, table_info, null);
                             var snapshots_dic = InsertIndexChanges(table_info, meta_index);
                             foreach (var snap in snapshots_dic)
                             {
@@ -1067,8 +1067,9 @@ namespace LinqDbInternal
                             {
                                 Dictionary<string, Tuple<IndexNewData, IndexDeletedData, IndexChangedData>> meta_index = BuildMetaOnIndex(table_info);
                                 var string_cache = new Dictionary<string, KeyValuePair<byte[], HashSet<int>>>();
+                                var lastPhase = GetLastStep(table_info);
                                 var rids = SaveItems(_save_data.ItemsServer, comm.TableDefOrder, batch, table_info, comm.TableName, trans_count_cache, string_cache, meta_index, false, new_ids);
-                                WriteStringCacheToBatch(batch, string_cache, table_info);
+                                WriteStringCacheToBatch(batch, string_cache, table_info, lastPhase);
                                 var snapshots_dic = InsertIndexChanges(table_info, meta_index);
                                 foreach (var snap in snapshots_dic)
                                 {
@@ -1232,7 +1233,7 @@ namespace LinqDbInternal
                                     ColumnName = name
                                 };
                                 UpdateItems(info, _update_data.valuesServer, table_info, batch, string_cache, meta_index);
-                                WriteStringCacheToBatch(batch, string_cache, table_info);
+                                WriteStringCacheToBatch(batch, string_cache, table_info, null);
                                 var snapshots_dic = InsertIndexChanges(table_info, meta_index);
                                 foreach (var snap in snapshots_dic)
                                 {
@@ -1382,7 +1383,7 @@ namespace LinqDbInternal
                                 var string_cache = new Dictionary<string, KeyValuePair<byte[], HashSet<int>>>();
                                 Dictionary<string, Tuple<IndexNewData, IndexDeletedData, IndexChangedData>> meta_index = BuildMetaOnIndex(table_info);
                                 Deleteitems(_delete_data.ids, batch, table_info, trans_count_cache, string_cache, meta_index);
-                                WriteStringCacheToBatch(batch, string_cache, table_info);
+                                WriteStringCacheToBatch(batch, string_cache, table_info, null);
                                 var snapshots_dic = InsertIndexChanges(table_info, meta_index);
                                 foreach (var snap in snapshots_dic)
                                 {

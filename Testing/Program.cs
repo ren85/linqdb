@@ -229,8 +229,11 @@ namespace Testing
                         new SimpleQueue(),
                         new QueuesPutGet(),
                         new QueueOverwhelmed(),
-                        new QueuesPutGetLarge()
-                    #endif 
+                        new QueuesPutGetLarge(),
+                    #endif
+                    new SearchSpecialCharacter(),
+                    new SearchSpacesOnly(),
+                    new SearchPartalRepeating()
                 };
 
                 var tests2 = new List<ITest>()
@@ -277,7 +280,7 @@ namespace Testing
 #endif
 
                 var times = new List<int>();
-                for (int i = 0; i < 30; i++)
+                for (int i = 0; i < 2; i++)
                 {
                     Console.Clear();
                     Console.WriteLine("SHUFFLE: " + i + "\n");

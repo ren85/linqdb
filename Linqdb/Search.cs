@@ -84,9 +84,9 @@ namespace LinqDbInternal
         public List<int> SearchOne(SearchInfo info, ReadOptions ro, bool partial, bool timeLimited, int timeLimitInMs, out double? searchPercintile, int? steps = null, int? start_step = null)
         {
             searchPercintile = null;
-            if (!info.Name.ToLower().EndsWith("search"))
+            if (!info.Name.ToLower().EndsWith("search") && !info.Name.ToLower().EndsWith("searchs"))
             {
-                throw new LinqDbException("Linqdb: only string properties named ...Search are indexed and can be searched.");
+                throw new LinqDbException("Linqdb: only string properties named ...Search (or ...SearchS) are indexed and can be searched.");
             }
             int totalSteps = GetLastStep(info.TableInfo.Name);
             if (!timeLimited)

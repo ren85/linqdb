@@ -323,7 +323,7 @@ namespace LinqDbInternal
                         }
                         foreach (var scache in sc)
                         {
-                            ldb.WriteStringCacheToBatch(batch, scache.Value.Value, scache.Value.Key);
+                            ldb.WriteStringCacheToBatch(batch, scache.Value.Value, scache.Value.Key, null);
                         }
                         foreach (var idata in index_data)
                         {
@@ -426,7 +426,7 @@ namespace LinqDbInternal
                         }
                         foreach (var scache in sc)
                         {
-                            ldb.WriteStringCacheToBatch(batch, scache.Value.Value, scache.Value.Key);
+                            ldb.WriteStringCacheToBatch(batch, scache.Value.Value, scache.Value.Key, null);
                         }
                         foreach (var idata in index_data)
                         {

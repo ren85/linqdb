@@ -281,7 +281,7 @@ namespace LinqDb
                             }
                             foreach (var scache in sc)
                             {
-                                _db.WriteStringCacheToBatch(batch, scache.Value.Value, scache.Value.Key);
+                                _db.WriteStringCacheToBatch(batch, scache.Value.Value, scache.Value.Key, null);
                             }
                             _db.leveld_db.Write(batch._writeBatch);
                         }
@@ -340,7 +340,7 @@ namespace LinqDb
                             }
                             foreach (var scache in sc)
                             {
-                                _db.WriteStringCacheToBatch(batch, scache.Value.Value, scache.Value.Key);
+                                _db.WriteStringCacheToBatch(batch, scache.Value.Value, scache.Value.Key, null);
                             }
                             _db.leveld_db.Write(batch._writeBatch);
                         }
