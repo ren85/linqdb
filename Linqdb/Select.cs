@@ -679,16 +679,41 @@ namespace LinqDbInternal
             }
         }
 
-        ConcurrentDictionary<string, object> compiled_cache = new ConcurrentDictionary<string, object>();
+        object _cache_lock = new object();
+        ConcurrentDictionary<string, List<object>> compiled_cache = new ConcurrentDictionary<string, List<object>>();
         T CreateType<T>(CompiledInfo<T> info, List<object> fields)
         {
             string key = info.ToString();
             if (!compiled_cache.ContainsKey(key))
             {
-                compiled_cache[key] = info.GetActivator();
+                lock (_cache_lock)
+                {
+                    if (!compiled_cache.ContainsKey(key))
+                    {
+                        compiled_cache[key] = new List<object>() { info.GetActivator() };
+                    }
+                }
             }
-            //create an instance:
-            T instance = (compiled_cache[key] as CompiledInfo<T>.ObjectActivator)(fields.ToArray());
+            object item = null;
+            for (int i = 0; i < compiled_cache[key].Count(); i++)
+            {
+                if (compiled_cache[key][i] is CompiledInfo<T>.ObjectActivator)
+                {
+                    item = compiled_cache[key][i];
+                    break;
+                }
+            }
+
+            if (item == null)
+            {
+                lock (_cache_lock)
+                {
+                    item = info.GetActivator();
+                    compiled_cache[key].Add(item);
+                }
+            }
+
+            T instance = (item as CompiledInfo<T>.ObjectActivator)(fields.ToArray());
             return instance;
         }
         //ConcurrentDictionary<string, object> compiled_cache = new ConcurrentDictionary<string, object>();

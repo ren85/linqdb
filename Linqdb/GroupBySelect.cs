@@ -97,6 +97,11 @@ namespace LinqDbInternal
             }
             var ids_index = indexes[table_info.Name + "|Id|" + id_snapshot_id];
 
+            if (!group_index.GroupListMapping.Any())
+            {
+                return new Dictionary<int, List<object>>();
+            }
+
             if (!fres.All)
             {
                 var tmp = new IndexGeneric()
@@ -111,6 +116,8 @@ namespace LinqDbInternal
                 tmp.Parts[0].GroupValues = EfficientContainsOneCall(ids_index, group_index, fres.ResIds, true, false).Item1;
                 group_index = tmp;
             }
+
+
             var prop_indexes = new Dictionary<string, IndexGeneric>();
             foreach (var agr in aggregates)
             {
@@ -163,7 +170,9 @@ namespace LinqDbInternal
                 }
             }
 
-            int max = group_index.GroupListMapping.Max(f => f.Value) + 1;
+            int max = 0;
+
+            max = group_index.GroupListMapping.Max(f => f.Value) + 1;
             var group_check_list = new List<bool>(max);
             for (int i = 0; i < max; i++)
             {

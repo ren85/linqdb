@@ -17,7 +17,7 @@ using Testing.basic_tests;
 using Testing.tables;
 
 
-/*For complete testing tests with these symbols must be run:
+/*For complete testing tests with these symbols must be run (Testing2 too), for 64bit builds:
 (empty)
 SAMEDB
 SAMEDB;INDEXES
@@ -28,7 +28,8 @@ SOCKETS;INDEXES
 DATA
 DATA;INDEXES
 DATA;SERVER
-DATA;SERVER;INDEXES
+DATA;SERVER;INDEXES;
+DISTRIBUTED; (for this 6 servers must be running at localhost:2055, localhost:2056, localhost:2057, localhost:2058, localhost:2059, localhost:2060)
  */
 
 namespace Testing
@@ -37,6 +38,12 @@ namespace Testing
     {
         static void Main(string[] args)
         {
+#if DISTRIBUTED
+            DistributedLists.Do();
+            return;
+#endif
+#if !DISTRIBUTED
+
             var sw = new Stopwatch();
             sw.Start();
 
@@ -51,12 +58,12 @@ namespace Testing
 #endif
                 var tests = new List<ITest>()
                 {
-                    #if ((SAMEDB || SERVER || SOCKETS) && INDEXES)
+#if ((SAMEDB || SERVER || SOCKETS) && INDEXES)
                         new IndexesPrepare(),
-                    #endif
-                    #if (!SAMEDB || !INDEXES)
+#endif
+#if (!SAMEDB || !INDEXES)
                         new OpenClose(),
-                    #endif                     
+#endif
                     new SimpleSave(),
                     new BatchSave(),
                     new SimpleWhere(),
@@ -133,9 +140,9 @@ namespace Testing
                     new UpdateDateTimeIndex(),
                     new UpdateDoubleIndex(),
                     new UpdateStringIndexNull(),
-                    #if (!SOCKETS && !SERVER && !SAMEDB && !INDEXES)
+#if (!SOCKETS && !SERVER && !SAMEDB && !INDEXES)
                         new LowLevelDelete(),
-                    #endif
+#endif
                     new ParallelWorkload(),
                     new ParallelWorkload2(),
                     new ParallelWorkloadManySelects(),
@@ -160,13 +167,13 @@ namespace Testing
                     new ManyWhere(),
                     new GetTables(),
                     new GetTableDefinition(),
-                    #if (SERVER && !INDEXES)
+#if (SERVER && !INDEXES)
                         new Config(),
                         new ServerStatus(),
-                    #endif 
-                    #if (!SOCKETS) //server/client architecture may differ
+#endif
+#if (!SOCKETS) //server/client architecture may differ
                         new SelectTooMuch(),
-                    #endif 
+#endif
                     new EmptyString(),
                     new BadDouble(),
                     new BadWhere2(),
@@ -186,22 +193,23 @@ namespace Testing
                     new TransactionEditingSameField(),
                     new BasicGroup(),
                     new GroupWhere(),
+                    new GroupByEmpty(),
                     new DistinctCountGroup(),
-                    #if (!SAMEDB && !SOCKETS && !SERVER) 
+#if (!SAMEDB && !SOCKETS && !SERVER)
                         new IndexRemovedField(),
-                    #endif
+#endif
                     new BadColumnIndexes(),
                     new GroupAggregation(),
                     new GroupByWrongColumn(),
-                    #if (SERVER && !INDEXES)
+#if (SERVER && !INDEXES)
                         new IndexOnStart(),
                         new GetIndexes(),
-                    #endif
+#endif
                     new SelectStringOnly(),
                     new IntersectString(),
-                    #if (SERVER && !INDEXES)
+#if (SERVER && !INDEXES)
                         new IndexRemove(),
-                    #endif
+#endif
                     new ParallelSaveSameIds(),
                     new NewIdTooBig(),
                     new AtomicIncrementOverflow(),
@@ -222,18 +230,21 @@ namespace Testing
                     new CaseInsensitive(),
                     new MaxBinaryAndString(),
                     new NonAtomicModifications(),
-                    new SelectNonAtomically(),
+#if (!SOCKETS) //server/client architecture may differ
+                        new SelectNonAtomically(),
+#endif
                     new SearchTimeLimited(),
                     new GenericType2(),
-                    #if (SERVER || SOCKETS)
+#if (SERVER || SOCKETS)
                         new SimpleQueue(),
                         new QueuesPutGet(),
                         new QueueOverwhelmed(),
                         new QueuesPutGetLarge(),
-                    #endif
+#endif
                     new SearchSpecialCharacter(),
                     new SearchSpacesOnly(),
-                    new SearchPartalRepeating()
+                    new SearchPartalRepeating(),
+                    new DiffNamespace()
                 };
 
                 var tests2 = new List<ITest>()
@@ -280,7 +291,7 @@ namespace Testing
 #endif
 
                 var times = new List<int>();
-                for (int i = 0; i < 2; i++)
+                for (int i = 0; i < 3; i++)
                 {
                     Console.Clear();
                     Console.WriteLine("SHUFFLE: " + i + "\n");
@@ -316,6 +327,7 @@ namespace Testing
                 Console.WriteLine("Oops (" + current.GetName() + "): " + ex.Message);
                 Console.ReadLine();
             }
+#endif
         }
     }
 }

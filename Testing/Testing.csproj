@@ -1,9 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <DefineConstants>SERVER;INDEXES</DefineConstants>
+    <TargetFramework>net8.0</TargetFramework>
+    <DefineConstants>SERVER</DefineConstants>
     <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
@@ -13,6 +13,14 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <DocumentationFile />
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>$(DefineConstants);SERVER</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <DefineConstants>$(DefineConstants);SERVER</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,6 +35,7 @@
     <ProjectReference Include="..\ServerSharedData\ServerSharedData.csproj" />
     <ProjectReference Include="..\ServerClient\ServerClient.csproj" />
     <ProjectReference Include="..\ServerLogic\ServerLogic.csproj" />
+    <ProjectReference Include="..\Testing2\Testing2.csproj" />
   </ItemGroup>
 
 </Project>

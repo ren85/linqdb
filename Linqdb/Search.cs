@@ -97,7 +97,7 @@ namespace LinqDbInternal
             {
                 var sw = new Stopwatch();
                 sw.Start();
-                int oneSearchSteps = 50;
+                int oneSearchSteps = 5;
                 var res = new List<int>();
                 int stepCount = 0;
                 for (; sw.ElapsedMilliseconds < timeLimitInMs && stepCount <= totalSteps; stepCount += oneSearchSteps)

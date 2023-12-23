@@ -48,6 +48,7 @@ namespace LinqdbClient
         string Hostname { get; set; }
         int Port { get; set; }
         private Db() { }
+
         /// <summary>
         ///  Initialize database. Required once per application lifetime. If user or pass is not supplied, admin-admin is used.
         /// </summary>
@@ -91,6 +92,15 @@ namespace LinqdbClient
                 });
             }
         }
+
+        /// <summary>
+        ///  Get Ip:port od database
+        /// </summary>
+        public string GetIpAndPort()
+        {
+            return $"{Hostname}:{Port}";
+        }
+
         /// <summary>
         ///  Get list of tables.
         /// </summary>
@@ -1769,7 +1779,15 @@ namespace LinqdbClient
             var res_obj = ServerResultHelper.GetServerResult(bres);
 
             var ids = res_obj.Ids;
+            if (ids == null)
+            {
+                return new List<R>();
+            }
             var results = new List<R>();
+            if (ids == null)
+            {
+                return results;
+            }
             for (int i = 0; ; i++)
             {
                 var currentIds = ids.Skip(i * batchSize).Take(batchSize).Select(f => (int?)f).ToList();
@@ -1858,6 +1876,10 @@ namespace LinqdbClient
             var res_obj = ServerResultHelper.GetServerResult(bres);
 
             var ids = res_obj.Ids;
+            if (ids == null)
+            {
+                return new List<T>();
+            }
             var results = new List<T>();
             for (int i = 0; ; i++)
             {
